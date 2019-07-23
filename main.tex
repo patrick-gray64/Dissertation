@@ -1,0 +1,145 @@
+%
+%                       This is a LaTeX 2e version of the
+%                       laboratory project template file.
+%\documentclass{aa}
+\documentclass[a4paper,12pt]{article}
+%\usepackage{fullpage,epsf}
+%
+%                       This subsection generates a title page
+%                       Edit only the subsections indicated to put
+%                       in the project title, your name, supervisor,
+%                       project length in weeks and submission date
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}% Recommended
+\usepackage{amsmath,amssymb,latexsym}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{geometry}
+\usepackage{lipsum}
+\usepackage{epigraph}
+
+\setlength{\parindent}{2em}
+%\setlength{\parskip}{1em}
+%\usepackage{biblatex}
+\usepackage{natbib}
+\usepackage{aas_macros}
+%\bibliographystyle{agsm}
+\usepackage[nottoc,notlof,notlot]{tocbibind} 
+\renewcommand\bibname{References}
+\bibpunct{(}{)}{;}{a}{}{,} % to follow the 
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  frame=single
+}
+
+\begin{document}
+\pagestyle{empty}                       % No numbers of title page                      
+%\epsfxsize=40mm                         % Size of crest
+\begin{minipage}[b]{110mm}
+        {\Huge\bf Computer and \\Information Sciences
+        \vspace*{17mm}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{40mm}               
+        \makebox[40mm]{
+        \includegraphics[width=1\linewidth]{strath_logo.png}}
+\end{minipage}
+\par\noindent                                           % Centre Title, and name
+\vspace*{0cm}
+\begin{center}
+        \Large\bf \Large\bf Dissertation\\
+        \Large\bf MSc Software Development\\[10pt]                     % Change to MP/CP/Astro
+        \LARGE\bf Automated Mutation Testing for Concurrent Software         % Change to suit
+\end{center}
+\vspace*{0cm}
+\begin{center}
+        \bf Patrick Gray\\                           % Replace with your name
+        August 2019                                    % Submission Date
+\end{center}
+\vspace*{5mm}
+%
+%                       Insert your abstract HERE
+%                       
+\begin{abstract}
+
+\end{abstract}
+\vspace*{2cm}
+Signature:\hspace*{8cm}Date: 19/08/2019
+
+\vfill
+{\bf Supervisor:} Kostas Liaskos             % Change to suit
+\hfill
+                                       % Change to suit
+\newpage
+
+%
+%                       End of Title Page
+\pagestyle{plain}                               % Page numbers at bottom
+\setcounter{page}{1}                            % Set page number to 1
+\tableofcontents                                % Makes Table of Contents
+
+\section{Introduction}
+
+\section{Background}
+    \subsection{Concurrency}
+    
+    
+    
+    
+    \subsection{Testing}
+    \subsection{Bug Patterns}
+    \subsection{Mutation Operators}
+
+\section{Methodology}
+	\subsection{Mutation Operators}
+	\subsection{Mutation Tool}
+	\subsection{Concurrent Software}
+	    \subsubsection{Banking System}
+	    \subsubsection{Incrementer System}
+	\subsection{Unit Tests}
+	    \subsubsection{JUnit Tests}
+	    \subsubsection{Concurrent Tests}
+	
+	\begin{figure}[t]
+		\centering
+		\includegraphics{strath_logo.png}
+		\caption[Optional text for list of figures.]{Caption text. Same syntax for tables.}
+	\end{figure}
+	
+	
+\section{Analysis}
+	
+\section{Conclusion}
+\newpage
+\section{Acknowledgements}
+
+\bibliographystyle{agsm} % style aa.bst
+\bibliography{bibliography.bib}
+
+\newpage
+\appendix
+\section{Appendices}
+
+
+\end{document}
