@@ -18,6 +18,8 @@
 \usepackage{geometry}
 \usepackage{lipsum}
 \usepackage{epigraph}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{multirow}
 
 \setlength{\parindent}{2em}
 \setlength{\parskip}{1em}
@@ -164,7 +166,8 @@ This is only one small example of interference, but similar occurrences of incon
 Synchronization allows for critical sections of code or methods to be executed atomically with reference to code in other threads. The power of scheduling operations and resource management is passed to the user \citep{silberschatz13}. The synchronized keyword blocks other threads from executing simultaneously during its execution to ensure that the state of the system is only affected by the actions within the synchronized block. Synchronization can be applied to a specific set of actions in a block, specifying the resource to be restricted or to an entire method. The two methods of using the synchronized keyword are shown in Figure \ref{fig:synchronized}. 
 
 \begin{figure}[h]
-    \includegraphics{synchronized.png}
+    \centering
+    \includegraphics[scale = 0.8]{synchronized.png}
     \caption{Synchronized block and synchronized method}
     \label{fig:synchronized}
 \end{figure}
@@ -196,7 +199,7 @@ Mutation testing is the process of seeding errors throughout a system’s codeba
 One example of a renowned mutation testing tool is Pitest (PIT), which combines traditional line coverage with mutation coverage, to offer a comprehensive and fast testing environment for Java applications \citep{pit19}. The list of mutation operators it provides is extensive, covering relational operators (e.g. \textless, \textless=, \textgreater, \textgreater=), mathematical operators (e.g. +, -, *, etc.), logic statements a variety of different common method calls and return values \citep{pit19}. A mutation usually consists of altering a small section of code or removing a section entirely. For example, a conditional boundary operator would make the following mutation  in Figure \ref{fig:mutation}. 
 
 \begin{figure}[h]
-    \includegraphics{mutation.png}
+    \includegraphics[scale = 0.65]{mutation.png}
     \caption{Relational operator mutation}
     \label{fig:mutation}
 \end{figure}
@@ -222,13 +225,13 @@ The theory of mutation testing has been presented, however the mechanism by whic
 
 Regular expressions, regex for short, are a syntactic description of a pattern, often used to search or manipulate strings in a text [cite]. Exact strings can be found with ease, but the true power behind regular expressions is the ability to search for generic patterns and manipulate any matches returned. The java.util.regex package allows a user defined pattern to be interpreted and will find any matches within a given text. This is primarily achieved using the Pattern and Matcher classes. Inputting a regular expression into a Pattern as a parameter will create a compiled version of the regex. The syntax of a pattern is built up of special character constructs that can match with independent characters or a defined range of characters. For example, a regex pattern could be used to search for a date in the following format DD month YYYY, i.e. 20 July 1969. This format has strict rules specifying that a date must consist of two digits followed by a word and finally four more digits. The regex can be made more complex by imposing more rules limiting the range of numbers for the day section to be between 1-31; the month section to only consist of the exact strings for the calendar months and the year section to be greater than 0000. All of this is achievable with the Java regex package. However, to keep it simple, the following regex example will only look for the basic two digits-word-two digits:
 \begin{equation}
-    (\setminus d\{2\}) (\setminus s) ([a-zA-Z]+) (\setminus s) (\setminus d\{4\})
+    \textbf{$\color{red}($} \setminus d\{2\} \textbf{$\color{red})($} \setminus s \textbf{$\color{red})($} [a-zA-Z]+ \textbf{$\color{red})($} \setminus s \textbf{$\color{red})($} \setminus d\{4\} \textbf{$\color{red})$}
 \end{equation}
 
 \begin{description}
     \item[ $\setminus d\{2\}, \setminus d\{4\}$ -] exactly 2 or 4 digits, respectively
     \item[ $\setminus s $ -] a single whitespace character
-    \item $[a-zA-Z]+$ - one or more letters in the range of a to z, lower or upper case
+    \item $[a-zA-Z]+$ \textbf{-} one or more letters in the range of a to z, lower or upper case
 \end{description}
 
 The brackets separates the regex into groups that can be manipulated in isolation from the rest of the matched expression. A Matcher object can then be created to compare a character sequence against the pattern and return any matches. The find() method attempts to find the next matching sequence in the input. The group(int group) method returns the sequence that was matched by the specified group, identified in order of appearance in the regex, e.g. ([a-zA-Z]+) is group 3. Finally, if the user wishes to replace any part of a matched string, the replaceFirst(String replacement) and replaceAll(String replacement) methods will replace either the first matched substring or all matching substrings, respectively, with a specified replacement string. A full API for these classes is provided by \citeauthor{regex_package19}.
@@ -274,7 +277,7 @@ In these scenarios, the programmer has assumed an interleaving between threads t
 \citeauthor{farchi03} cover another example of an unexpected interleaving bug pattern involving the notify() and wait() methods. However, the concurrent systems tested in this project do not contain any instances of these methods and thus, the notify() bug pattern will not be covered in this review.   
 
 
-\subsubsection{Blocking Code}
+\subsubsection{Blocking Code} \label{section:Blocking Code}
 
 In some circumstances, a segment of code can have an unexpected behaviour in a thread that blocks other threads from executing, resulting in the system hanging indeterminately. This obviously can have a very drastic effect on the performance of a program.
 
@@ -284,7 +287,7 @@ In some circumstances, a segment of code can have an unexpected behaviour in a t
 Again, only one of the patterns in this category can be found in the concurrent systems and is covered in this section.
 
     
-\subsection{Mutation Operators}
+\subsection{Concurrent Mutation Operators}
 \citet{bradbury06} have comprehensively designed a set of mutation operators specific to the concurrent functionality and the bug patterns identified by \citeauthor{farchi03} The focus of their research is in response to the updated concurrent functionality introduced in the J2SE 5.0 version of Java. Synchronization can now be implemented using explicit locks, semaphores, barriers, latches and exchangers. Support for these various concurrent operations persists through the more recent versions of Java with some minor updates and revisions. In total, \citeauthor{bradbury06} to produce 22 different mutation operators, each of which are associated with a number of different concurrent methods. The operators are split into groups relating to the concurrent bug patterns described in the work of \citeauthor{farchi03}
 
 Mutation analysis for non-concurrent systems has been covered extensively in research and made available through a variety of different tools [cite]. With their mutation operators, \citeauthor{bradbury06}'s aim is to help improve the quality and development of concurrent Java applications by making programmers aware of the various pitfalls surrounding concurrency. The operators have been divided into five categories:
@@ -301,57 +304,215 @@ Mutation analysis for non-concurrent systems has been covered extensively in res
 Some of these operators are modified versions of existing operators, whereas some are novel. 1-3 of the above categories will be explored in the following sections. Categories 4 \& 5 are not covered since none of the mutation operators from these categories are implemented in the tool developed for this project. The specific operators that have been implemented will be fully explored in the Methodology section of this report. The full list of \citeauthor{bradbury06}'s mutation operators can be found in Table \ref{table:MO_cat} in the Appendices section.
 
 
-\subsubsection{Modify Parameters of Concurrent Method} \label{Modify Parameters}
+\subsubsection{Modify Parameters of Concurrent Method} \label{section:Modify Parameters}
 
 Altering the parameters of a method in any way can cause a dramatic difference to the original intention when calling the method. The operators in this category aim to do just that for any concurrent method or methods related to threads. This can involve changing the value of an input parameter or removing a parameter altogether, assuming the method has an overloaded version to support this removal.  
 
 
-\subsubsection{Modify the Occurrence of Concurrency Method Calls} \label{Modify Method Calls}
+\subsubsection{Modify the Occurrence of Concurrency Method Calls} \label{section:Modify Method Calls}
 
 In contrast to the previous category of modifying method parameters, this set operates on the method calls themselves. The mutation can manifest in three forms: a method call can be removed, replaced or exchanged with a similar method.   
 
 
-\subsubsection{Modify Keywords} \label{Modify Keywords}
+\subsubsection{Modify Keywords} \label{section:Modify Keywords}
 
 This category is similar to the previous type, but focuses solely on the addition or removal of certain concurrent keywords, such as static, synchronized, volatile and finally. These keywords affect the behaviour of classes, methods and variables, thus modifying them may have significant effects when calling a mutant version.
 
 
-\subsection{Motivation}
+\newpage
+\section{Methodology}
 
 The background information has been presented and the literature surrounding Mutation testing operators has been explored. The motivation for the project should now be clear. Although there are mutation testing tools available for Java applications, they lack support for concurrency. Thus, the aim of the project is to build a mutation testing tool that will automatically apply mutations specific to concurrent operations, utilising the operators provided by \citeauthor{bradbury06} This will provide support for programmers to analyse the effectiveness of their unit tests for multi-threaded functionality.
 
-The following Methodology section will describe the development process in detail and the steps taken to ensure the mutation testing tool is robust.   
+This Methodology section will describe the development process in detail and the steps taken to ensure the mutation testing tool is robust.   
 
 
+\subsection{Selected Mutation Operators}
 
-\newpage
-\section{Methodology}
-\subsection{Mutation Operators}
-
+Before development of the software for the mutation testing tool, a small selection of mutation operators from \citeauthor{bradbury06} were chosen to be implemented into the tool. This section describes the selected operators: \textit{Modify Method-X Timeout, Modify Synchronized Block Parameter, Remove Thread Method-X Call, and Remove Concurrency Mechanism Method-X Call}. These four operators target commonly used concurrency features and the mechanisms by which they apply their respective mutations are straightforward. Thus, they proved to be the ideal candidates for implementation by maximising the number of potential method mutations and required the least amount of time to develop. Since the latter two operators both involve removing method calls, only one programming function was necessary to apply these mutations to the list of different methods.    
 
 \subsubsection{MXT - Modify Method-X Timeout}
 
-The MXT operator falls under the category of \textit{Modify Parameters of Concurrent Method}, found in Section \ref{Modify Parameters}. The objective of this operator is to modify the time parameter in the methods wait(long time), await(long time), sleep(long time) and join(long time) \citep{bradbury06}. The wait, await and join methods both have an overloaded equivalent without the time parameter, meaning that the mutation can remove or modify for varying effects. Removing the time parameter from the wait method forces the current thread to remain inactive until a notify() or notifyAll() method is called to release the interruption. The await method is similar to the wait method, but is instead released by a signal() or signalAll() method call in another thread. The join method is called on a thread and will wait until it has completed execution or until the specified time has elapsed, after which, the code following the join() call will be executed in the same thread. The sleep method will interrupt the current thread for the specified time. The mutation that has been implemented in the tool is to either remove the time parameter, if applicable, or to reduce the time by half.        
+The MXT operator falls under the category of \textit{Modify Parameters of Concurrent Method}, found in Section \ref{section:Modify Parameters}. The objective of this operator is to modify the time parameter in the methods wait(long time), await(long time), sleep(long time) and join(long time) \citep{bradbury06}. The wait, await and join methods all have an overloaded equivalent without the time parameter, meaning that the mutation can remove or modify for varying effects. Removing the time parameter from the wait method forces the current thread to remain inactive until a notify() or notifyAll() method is called to release the interruption. The await method is similar to the wait method, but is instead released by a signal() or signalAll() method call in another thread. The join method is called on a thread and will wait until it has completed execution or until the specified time has elapsed, after which, the code following the join() call will be executed in the same thread. The sleep method will interrupt the current thread for the specified time. The mutation that has been implemented in the tool is to either remove the time parameter, if applicable, or to reduce the time by half. An example of this type of mutation can be seen in Figure \ref{fig:MXT}. 
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.55]{MXT.png}
+    \caption{MXT mutation \citep{bradbury06}}
+    \label{fig:MXT}
+\end{figure}
+
+In this example, prior to the mutation, the wait time had been set to a sufficient length to allow other threads to fully execute any concurrent operations that may interfere with mutually accessed resources. However, cutting this time in half may not leave enough time for another thread to complete execution. Various similar problems can occur when applying the MXT mutation to the other concurrent methods mentioned above. These errors will be discussed in the Results section, for each method tested.  
 
 \subsubsection{MSP - Modify Synchronized Block Parameter}
 	
-	
+The MSP is another \textit{Modify Parameters of Concurrent Method} operator that alters the parameter of a synchronized block. The \textit{synchronized} keyword is applied to an object that the programmer wishes to be thread safe when executed by blocking other concurrent actions from taking place. The mutation made by this operator aims to replace the synchronized object parameter with another object \citep{bradbury06}. The simplest method of achieving this is to replace the object with the keyword \textit{this}. An example of this is given in Figure \ref{fig:MSP}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.6]{MSP.png}
+    \caption{MSP mutation \citep{bradbury06}}
+    \label{fig:MSP}
+\end{figure}
+
+The keyword \textit{this} refers to the current object: an instance of the class in which the method has been defined. Thus, the effects of changing the lock object to \textit{this}, the lock object becomes no longer thread safe and executing the critical section of code leaves the lock object susceptible to unpredictable behaviour when interleaving with other threads.  
 
 \subsubsection{RTXC - Remove Thread Method-X Call}
 
+The RTXC belongs to the \textit{Modify the Occurrence of Concurrency Method Calls} category in section \ref{section:Modify Method Calls}. This mutant simply removes calls to the Thread methods wait(), join(), sleep(), yield(), notify(), and notifyAll() \citep{bradbury06}. Figure \ref{fig:RTXC} provides an example for this mutation.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.35]{RTXC.png}
+    \caption{RTXC mutation \citep{bradbury06}}
+    \label{fig:RTXC}
+\end{figure}
+
+Removing a call to any of the Thread methods also removes control from the user in their ability to schedule thread execution. The behaviour of the system is likely to change from the original expectations.
 
 \subsubsection{RCXC - Remove Concurrency Mechanism Method-X Call}
+
+The final mutation operator that was selected aims to remove a variety of different concurrent methods: lock(), unlock(), signal(), signalAll(), acquire(), release(), countDown(), and submit() \citep{bradbury06}. It utilises the same removal mechanism as the previous operator, RTXC, and is also in the same in category, \textit{Modify the Occurrence of Concurrency Method Calls}. Potentially the most significant method removals are for the lock() and unlock() methods. This is shown in Figure \ref{fig:RCXC}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale = 0.6]{RCXC.png}
+    \caption{RCXC mutation \citep{bradbury06}}
+    \label{fig:RCXC}
+\end{figure}	
+
+Altering a lock on an object will have a similar behaviour to mutating a synchronized block; the object becomes no longer thread safe. Removing an unlock will prevent this thread from releasing the lock and will prevent any other threads from acquiring the lock to begin execution. Referring to work of \citeauthor{farchi03}, this can result in a \textit{Blocking Critical Section Bug} described in section \ref{section:Blocking Code}.   
+  	
 	
-	
-	\subsection{Mutation Tool}
-	\subsection{Concurrent Software}
-	    \subsubsection{Banking System}
-	    \subsubsection{Incrementer System}
-	\subsection{Unit Tests}
+\subsection{Mutation Tool}
+
+With the four mutation operators identified above, the core functionality of the mutation testing tool could be designed. The main objective of the software is as follows: 
+
+\begin{itemize}
+    \item Select an input file, a mutation operator and a method to be mutated
+    \item Count the number of instances of the selected method in the input file
+    \item Randomly select a match and perform the mutation
+    \item Write the mutation to a new file
+\end{itemize}
+
+The system consists of two classes: the Mutator class contains the methods that perform the above functionality, and the MutatorRunnable class creates a Mutator object, passes the necessary input and executes the mutation. The Mutator class accepts a File object as its only parameter. The mutation is performed by calling the replaceMutation() method.  
+
+When running the mutation tool, the user is prompted to select an input file, an operator and a method they wish to be mutated. The tool will recognise if this combination is suitable by verifying that the input are compatible. If the user has attempted to input an incompatible pair of method and operator, then an error will flag up indicating this. This is achieved by storing a string of each operator and method in an ArrayList related to each operator. When the user inputs their desired mutation operator and method, the strings will be compared against the ArrayList contents to verify that their options are suitable. If the user selects a successful pair then the tool will begin to search the input file for any matches against the regex pattern. The matches will be returned to the user with their respective character location in the input file. The mutation is designed to only be applied to one match at random, if there are multiple matching methods. 
+
+An algorithm was created to achieve this random selection by applying the following method. A count of the matches is stored as a local variable. The first match is encountered and a Random() function chooses a number between 1 and the count. If the random number matches the count then the first match will be selected to be mutated. The chances of this happening are 1/count; the algorithm provides an equal chance of mutation to each match. When the random number does not match, the count is reduced and the process is repeated for each subsequent match.
+
+The following regex pattern was designed to match with any combination of mutation operator and associated method.
+
+\begin{equation}
+    \textbf{$\color{red}($}\setminus s^*.^*\setminus b \textbf{ method} \setminus (\textbf{$\color{red})($}\setminus w^*\textbf{$\color{red})($}.^*\textbf{$\color{red})$}    
+\end{equation}
+
+\noindent$ \setminus s^* $ - zero or more whitespace characters e.g. the beginning of a line
+\\$ .^* $ - zero or more of any character e.g. any number of chained methods
+\\$\setminus b$ - a word boundary e.g. a full stop indicating the calling of the selected method or the beginning of the line
+\\$\setminus ($ - a bracket e.g. the beginning of the method parameter
+\\$\setminus w*$ - zero or more of any word characters e.g. any number of parameters
+\\$.*$ - zero or more of any character e.g.
+
+The regular expression was generalised so that only one pattern was required, instead of a separate pattern for each combination of method and mutation operator. The pattern is separated into the three groups in red brackets. In general, the first group identifies the method call, the second identifies the parameters and the third identifies any syntax following the end of the parameters e.g. \textbf{)} , \textbf{\{} , \textbf{;} , etc. Before the pattern is compiled, the regex is stored as a string with the input method stored as a string variable. Thus, for any method that the user wishes to mutate, the regex string can be easily updated and then compiled as a Pattern object. Group 1 allows for the tool to easily find the specified method by the user. Group 2 is the main target for two of the mutation operators as they aim to alter the parameters. The MXT operator accesses group 2 and appends the parameter with "/2" to divide the specified length of time by 2 or simply remove the parameter altogether. The MSP operator accesses group 2 and replaces the parameter object with the keyword \textit{this}. The operators RCXC and RTXC both remove the entire method call by deleting the entire matched pattern from the code.       
+
+Once a match has been selected, the mutation will be applied to the relevant section of code using the String.replaceFirst(regex, replacement) method. The limitation of this method is that it will perform a replacement only on the first instance of a match within a string. To overcome this, the full input file is split into two separate strings for each match: one before, excluding the match and one after, including it. This ensures that the current selected match is the first occurrence in the second string. The mutation can therefore be applied to any of the method matches in a file. After the mutation, the two strings are stitched back together to recreate the original file with only the desired alteration. The mutant is written to a new file within the project. Note that the original file remains completely intact and the mutant is a separate file.
+
+For example, Figure \ref{fig:rand_match} shows a code segment that has two wait methods that would match against a mutation operator such as the MXT. In this scenario, the mutation tool has identified that there are two matches. On the first iteration, when deciding which match to apply the change to, it has split the code into two strings up to the first match and after. If it decided to mutate the second match, then the two strings are shifted to before and after the second instance of wait. 
+
+\begin{figure}[h]
+    \hspace{-1.6cm}
+    \includegraphics[scale =0.4]{random_match.png}
+    \caption{Input code is split into two strings, before and after a method match.}
+    \label{fig:rand_match}
+\end{figure}
+
+
+\subsection{Concurrent Software}
+
+With the mutation testing tool built and the mutation operators fully implemented, to ensure the tool worked effectively, it needed some concurrent systems to test on. A typical banking system was selected after having identified that it contained a sufficient number of different concurrent features that were compatible with the four mutation operators the tool had to offer. The second, the Incrementer system, was developed to match the concurrent features found in the banking system but with different core functionality. Applying the tool to a variety of software systems provides greater verification and assurance of the tool's effectiveness. The two systems and the unit tests designed for each will be explored in detail in the following sections.
+
+
+\subsubsection{Banking System}
+
+The banking system contains four different Account classes that provide different functionality for slightly different purposes when handling money. The Account class is an abstract parent class that the CurrentAccount, LoanAccount and SavingsAccount all inherit from. The main difference between the account classes is their specific method of withdrawing or depositing money. Each method also an associated Runnable class to allow for multi-threaded execution. The Account class holds generic methods for depositing and transferring money, as well as the base constructor which defines the initial balance and name of the Account object. The following methods all contain concurrent functionality in an attempt to prevent interference from interleaving threads:  deposit(double amount), withdraw(double amount) and transferMoney(double amount, Account recipient). These methods and their functionality will be explored below. 
+
+\textbf{\\Account - deposit(double amount)}
+\\This method aims to deposit the specified amount of money into the currently accessed Account object. A lock on the critical section of code is introduced to prevent other threads from performing any interfering actions. After updating the balance, a signalAll() is called on the  concurrent condition, fundsAvailableCondition, which informs other threads that the Account object now has a positive balance. Finally, the lock is released to allow other threads to execute concurrently.
+
+\textbf{\\LoanAccount - deposit(double amount)}
+\\The LoanAccount overrides the parent deposit method to support the different style of account. The LoanAccount's purpose is to allow the user to take a loan of a specified amount of money and deposit that money into a CurrentAccount. The initial balance of the LoanAccount is then the negative of this amount. Money can be deposited into the LoanAccount to pay off the loan and if the balance becomes greater than £0, the positive balance will be deposited into the CurrentAccount from before. The deposit method utilises concurrency through the lock system and calls the parent version of the deposit method detailed above.  
+
+
+\textbf{\\CurrentAccount - withdraw(double amount)}
+\\The withdraw method has the simple objective of removing money from an Account, however, there are some rules imposed on when this is allowed. The CurrentAccount constructor sets an overdraft limit of £50, meaning that the account cannot have less than -£50 available after any transaction. If the user attempts to withdraw an amount of money that would leave the account with less than this limit then the thread will wait until there are sufficient funds in the account by calling an await(time) on the fundsAvailableCondition. The Thread will resume when a signal() or signalAll() method is called in another thread, such as the deposit method, or until the elapsed time has passed. In the instance of time running out and there still not being enough money in the account, the thread will be interrupted using Thread.interrupt() and the withdrawal will not take place. After either circumstance, the method will release control of the lock it has.
+
+
+\textbf{\\SavingsAccount - withdraw(double amount)}
+\\The SavingsAccount version of withdraw has the same functionality as the CurrentAccount version with the addition of imposing a fee on each withdrawal. The user selects an amount to be withdrawn from the SavingsAccount but this amount plus a predefined fee will be withdrawn. The concurrent features are the same as those found in the CurrentAccount method.
+
+
+
+\textbf{\\Account - transferMoney(double amount, Account recipient)}
+\\The transferMoney method withdraws money from one Account and deposits that amount in another Account, using the respective methods. Thus, it does not have any unique concurrent issues of its own, although it will encounter the same problems that can be found in the deposit and withdraw methods. A successful transfer will only take place if the withdrawal is successful and returns true.
+
+Tables \ref{table:bank_concurrent_methods} \& \ref{table:bank_concurrent_classes} highlight every concurrent method that occurs in each of the Bank System methods described above. This information was then used to design the effective unit tests for all concurrent behaviour within the Bank System, which will be explored in Section \ref{section:Unit Tests}.
+
+
+\begin{table}[]
+\hspace{-2.1cm}
+\begin{tabular}{lcllllll}
+                                                                                                                 & \multicolumn{1}{l}{}                                                                    &                                               &                                               & \multicolumn{2}{l}{\textbf{Concurrent Feature}}                                               &                                               &                                               \\ \cline{3-8} 
+                                                                                                                 & \multicolumn{1}{l|}{\textbf{}}                                                          & \multicolumn{1}{c|}{lock}                     & \multicolumn{1}{c|}{unlock}                   & \multicolumn{1}{c|}{signalAll}                & \multicolumn{1}{c|}{interrupt}                & \multicolumn{1}{c|}{await}                    & \multicolumn{1}{c|}{newCondition}             \\ \cline{2-8} 
+\multicolumn{1}{l|}{}                                                                                            & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Account \\ constructor\end{tabular}}     & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} \\ \cline{2-8} 
+\multicolumn{1}{l|}{}                                                                                            & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Account\\ deposit\end{tabular}}          & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         \\ \cline{2-8} 
+\multicolumn{1}{c|}{}                                                                                            & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Account\\ transferMoney\end{tabular}}    & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{}                         \\ \cline{2-8} 
+\multicolumn{1}{c|}{\multirow{-2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Bank \\ System \\ Method\end{tabular}}}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}LoanAccount \\ constructor\end{tabular}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} \\ \cline{2-8} 
+\multicolumn{1}{l|}{}                                                                                            & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}LoanAccount\\ deposit\end{tabular}}      & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{}                         \\ \cline{2-8} 
+\multicolumn{1}{l|}{}                                                                                            & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}CurrentAccount\\ withdraw\end{tabular}}  & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{}                         \\ \cline{2-8} 
+\multicolumn{1}{l|}{}                                                                                            & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}SavingsAccount\\ withdraw\end{tabular}}  & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{}                         \\ \cline{2-8} 
+\end{tabular}
+\caption{Concurrent features that occur in the Banking System methods. Green boxes indicate that the concurrent method is directly called. Blue boxes indicate that the concurrent method is indirectly called by calling another method from a different class. For example, the Account transferMoney method calls a deposit and a withdraw method which contain the concurrent methods signalAll, interrupt and await.}
+\label{table:bank_concurrent_methods}
+\end{table}
+
+\begin{table}[]
+\hspace{-2.1cm}
+\begin{tabular}{lcllllll}
+                                                                                                              & \multicolumn{1}{l}{}                &                                               &                                               & \multicolumn{2}{l}{\textbf{Concurrent Feature}}                                               &                                               &                                               \\ \cline{3-8} 
+                                                                                                              & \multicolumn{1}{l|}{\textbf{}}      & \multicolumn{1}{c|}{lock}                     & \multicolumn{1}{c|}{unlock}                   & \multicolumn{1}{c|}{signalAll}                & \multicolumn{1}{c|}{interrupt}                & \multicolumn{1}{c|}{await}                    & \multicolumn{1}{c|}{newCondition}             \\ \cline{2-8} 
+\multicolumn{1}{c|}{\textbf{}}                                                                                & \multicolumn{1}{c|}{Account}        & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} \\ \cline{2-8} 
+\multicolumn{1}{c|}{}                                                                                         & \multicolumn{1}{c|}{CurrentAccount} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} \\ \cline{2-8} 
+\multicolumn{1}{c|}{\multirow{-2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Bank\\ System\\ Class\end{tabular}}}} & \multicolumn{1}{c|}{SavingsAccount} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} \\ \cline{2-8} 
+\multicolumn{1}{l|}{}                                                                                         & \multicolumn{1}{c|}{LoanAccount}    & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{32CB00}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} & \multicolumn{1}{l|}{\cellcolor[HTML]{31A4FF}} \\ \cline{2-8} 
+\end{tabular}
+\caption{Concurrent features that occur in the Banking System classes. Green boxes indicate that the concurrent method is directly called. Blue boxes indicate that the concurrent method is indirectly called by calling another method from a different class.}
+\label{table:bank_concurrent_classes}
+\end{table}
+
+
+\subsubsection{Incrementer System}
+The Incrementer system was designed with the specific purpose of containing all of the same concurrent features found in the Banking System. A list of these methods can be found in Tables \ref{table:bank_concurrent_methods} \& \ref{table:bank_concurrent_classes}. The core functionality of this system is basic and mostly involves exploiting the non-atomic action of incrementing an integer, \textit{x}, using the operation \textit{x++}. Section \ref{section:atmoic} explains this operation in detail. This system consists of one main class, Incrementer, with a variety of similar methods that perform the \textit{x++} operation but utilising different concurrent features. The motivation behind creating this system was as a proof-of-concept and to help reproduce the results of performing unit tests on the Banking System. Thus, the Incrementer system is not very complex or pertains to any practical usefulness in its functionality. In a few cases, extra concurrent features were implemented. Each of the concurrent methods will be explored below.        
+	    
+\textbf{\\Incrementer - increment(int inc)}	    
+\\The base increment method allows the user to enter an amount to increase a global integer count by. A delay is introduced between each increment using the Thread.sleep method. There are no safety mechanisms implemented, such as a lock or synchronized block and  the time delay was set to 750 ms to artificially provide enough time for interference to regularly occur from concurrently executing threads. This is the only concurrent feature of this method.  
+
+\textbf{\\Incrementer - incrementLocked(int inc)}
+\\The incrementLocked method is the thread safe version of the base increment by introducing a lock and unlock call before and after an increment call.  
+
+\textbf{\\Incrementer - incrementInterrupt(int inc)}
+\\This incrementing method invokes an interruption on the current thread with a Thread.interrupt() call. The count will only be incremented if the Thread.interrupted() returns true. With unmutated code, this will always be true but applying the RTXC mutation operator on the interrupt call will cause the method to behave incorrectly.    
+
+\textbf{\\Incrementer - incrementAwait(int inc)}
+\\The incrementAwait method operates on a similar premise to the fundsAvailableCondition seen in the Banking System withdraw methods. The user inputs a specified amount to increase the count, however, if the end count is below 5 then the thread will wait for 3 seconds for another thread to increase the global count value, using an await() call. It will return true if the count is successfully increased to at least 5 within this timeframe. It will return false otherwise. This method relies on another method to execute a signal() or signalAll() to inform this thread that the count has been increased. The following method performs this. 
+
+
+\textbf{\\Incrementer - multiplierSignal(int mult)}
+	    
+	\subsection{Unit Tests} \label{section:Unit Tests}
 	    \subsubsection{JUnit Tests}
 	    \subsubsection{Concurrent Tests}
-    \subsection{Software Engineering}
+    \subsection{Software Engineering Process}
 	
 	
 \newpage	
@@ -387,6 +548,10 @@ There may be an argument to introduce a default wait time of 0 seconds, stored a
 
 It was deemed sufficient to test the systems with only two threads. Since the systems were small in scale and designed in such a manner that errors would be readily caught, increasing the number of threads would be superfluous. If a mutation was identified and killed by any unit test with only two interleaving threads, then the mutation would definitely be caught in number of more threads. However, in larger, more complex systems, any bug may be significantly harder to find, so increasing the number of threads with the objective of maximising the likelihood of interference could be an effective approach.
 
+In terms of refactoring, it might prescient to break the structure of the tool down into separate subclasses for each mutator. The hierarchy would have an abstract Mutator parent class with each mutator inheriting from it. This would have the positive effect of expandability when introducing new mutation operators. The core methods could be inherited with ease and only the necessary methods overridden. This would follow the Object Oriented paradigm to greater effect. One drawback, however, is that a runnable class would have to be created for each mutator, whereas at with just one mutator class, the user can choose a different operator with ease when performing multiple tests.
+
+Each file in the concurrent systems was stored outside of the IntelliJ project, isolated from the mutation testing tool. These files were intact and contained no errors or mutations; the mutation tool would accept these clean files as input before corrupting them with mutations. After applying the mutation, unit tests had to be performed on the new file, thus each mutant had to overwrite the previous mutation and then introduce the file to the IntelliJ project where the unit tests were stored. This method ensured that the original files remained intact and that only one mutation would be present in the project version. Simultaneously, each mutation was saved to another location on file to keep a record of results. 
+
     
     
 \newpage	
@@ -405,9 +570,9 @@ The original goal was to end up with a full test suite that would seed many muta
 \appendix
 
 \section{Appendices}
-\begin{table}
+\begin{table}[h]
     \centering
-    \includegraphics[scale = 0.9]{MO_categories.png}
+    \includegraphics[scale = 0.65]{MO_categories.png}
     \caption{List of concurrency mutation operators devised by \citeauthor{bradbury06} The green highlighted operators have been fully implemented in the mutation testing tool. The blue highlighted operators could be implemented without difficulty.}
     \label{table:MO_cat}
 \end{table}
