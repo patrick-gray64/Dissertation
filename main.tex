@@ -549,25 +549,28 @@ The unit tests written for concurrent actions were of a slightly different struc
 \\Two withdrawals from a \textit{CurrentAccount} are attempted in this test. To pass, only one of the withdrawals can be successful, otherwise the account balance will be below the limit set on the account. The \textit{withdraw} methods makes multiple checks to the current balance before allowing a transaction to take place. However, in a thread-unsafe scenario, if one thread were to check the balance just before another thread made a successful withdrawal from the same account, then the balance it has will no longer be correct. The second thread will then be permitted to perform a second withdrawal over the limit.    
 
 \textbf{\\CurrentWithdrawLoanDepositTest}
+\\This test checks that the \textit{LoanAccount deposit} method functions correctly with a corresponding \textit{CurrentAccount}. The user takes out a loan so that the \textit{CurrentAccount} initially has a positive balance and the \textit{LoanAccount} has a negative balance. The \textit{CurrentAccount} attempts to make a withdrawal that exceeds the limit and waits for funds to become available. Then a deposit will be made to the \textit{LoanAccount}, such that the balance becomes positive and the excess is deposited into the \textit{CurrentAccount} and the withdrawal from this account can proceed. For this test to pass, both methods must be functioning in a perfectly thread-safe way.   
 
-
-\textbf{\\CurrentTransferDepositTest}
-
+\textbf{\\CurrentTransferTest}
+\\The \textit{transfer} method moves money from one \textit{Account} to another by withdrawing from one and depositing in the other. The test for this is similar to the \textit{CurrentWithdrawTest}, where the sender attempts to transfer too much money to another account and has to wait for available funds from a deposit.  
 
 \textbf{\\CurrentTransferDepositWithdrawTest}
+\\The final test combines all of the concurrent methods in three separate threads to maximise the chances of interference. Two \textit{CurrentAccounts} are created, one sender and one receiver. The sender attempts to withdraw a large sum of money, transfer money to the other account and finally deposit a large enough sum to allow the other two transactions to be successful.  
 
-
-
+All of these tests determine a pass or failure by evaluating the balance of each \textit{Account} object after all of the concurrent actions have taken place. The nature of the tests ensures that the outcome should always be the same for correct functionality but a mutant will likely produce a different outcome. 
 
 \subsubsection{Incrementer Concurrent Tests}
 
 \textbf{LockTest}
-
+\\The \textit{LockTest} performs two \textit{incrementLocked} methods in separate threads to produce the interference bug shown in Section \ref{section:atmoic} Table \ref{table:non-atomic}. Removing the locks through a mutation will mean that the threads are attempting to access and modify the \textit{Incrementer} object's count at the same time. 
 
 \textbf{\\InterruptTest}
 
 
 \textbf{\\AwaitSignalTest}
+
+Similar to the Banking system concurrent tests, the critical variable that is evaluated after concurrent actions have terminated is the count in this case.   
+
 
 
     \subsection{Software Engineering Process}
@@ -592,7 +595,7 @@ Bradbury et al. conjecture that “The MXT operator with the sleep() and join() 
 
 “The RCXC operator removes this [unlock] call thus the lock is not released. This is an example of a blocking critical section bug.”
 
-    
+Since it can be difficult to predict the scheduling order of concurrently running threads, all concurrent tests were run many times until the desired result was observed. If the test managed to catch a bug in at least one of the runs then it was deemed successful, regardless of whether other runs failed to kill a mutation.     
     
     
     
