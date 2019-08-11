@@ -501,14 +501,13 @@ The Incrementer system was designed with the specific purpose of containing all 
 \\The \textit{incrementLocked} method is the thread safe version of the base increment by introducing a \textit{lock} and \textit{unlock} call before and after an \textit{increment} call.  
 
 \textbf{\\Incrementer - incrementInterrupt(int inc)}
-\\This incrementing method invokes an interruption on the current thread with a \textit{Thread.interrupt()} call. The count will only be incremented if the \textit{Thread.interrupted()} returns true. With unmutated code, this will always be true but applying the RTXC mutation operator on the interrupt call will cause the method to behave incorrectly.    
+\\This incrementing method invokes an interruption on the current thread with a \textit{Thread.interrupt()} call if the count mod 5 is equal to 0. The count will only be incremented if a \textit{Thread.interrupted()} call returns true. With unmutated code, this will always be true but applying the RTXC mutation operator on the interrupt call will cause the method to behave incorrectly.    
 
 \textbf{\\Incrementer - incrementAwait(int inc)}
-\\The \textit{incrementAwait} method operates on a similar premise to the \textit{fundsAvailableCondition} seen in the Banking System withdraw methods. The user inputs a specified amount to increase the count, however, if the end count is below 5 then the thread will wait for 3 seconds for another thread to increase the global count value, using an \textit{await()} call. It will return true if the count is successfully increased to at least 5 within this time frame. It will return false otherwise. This method relies on another method to execute a \textit{signal}() or \textit{signalAll}() to inform this thread that the count has been increased. The following method performs this. 
+\\The \textit{incrementAwait} method operates on a similar premise to the \textit{fundsAvailableCondition} seen in the Banking System withdraw methods. This method will execute an increment if an \textit{await} call is interrupted by a \textit{signalAll}, or if the count is greater than zero at the start of execution. Otherwise, no increment will occur.
 
-
-\textbf{\\Incrementer - multiplierSignal(int mult)}
-\\The \textit{multiplierSignal} method is to be used in conjunction with the \textit{incrementAwait} method. If the current count is greater than zero but less than 5, then calling this method will multiply the count by the specified input repeatedly until the count is greater than 5. After a successful multiplication, a \textit{signalAll} method is called to inform the thread running the \textit{incrementAwait} method that it can return to execution.    	    
+\textbf{\\Incrementer - incrementSignal(int inc)}
+\\ This method is similar to the \textit{incrementLocked}, however, before releasing the lock, it will call a \textit{signalAll} on the global condition to alert the \textit{incrementAwait} method that it can continue execution. 
 
 \begin{table}[]
 \hspace{-3cm}
@@ -557,7 +556,7 @@ The unit tests written for concurrent actions were of a slightly different struc
 \textbf{\\CurrentTransferDepositWithdrawTest}
 \\The final test combines all of the concurrent methods in three separate threads to maximise the chances of interference. Two \textit{CurrentAccounts} are created, one sender and one receiver. The sender attempts to withdraw a large sum of money, transfer money to the other account and finally deposit a large enough sum to allow the other two transactions to be successful.  
 
-All of these tests determine a pass or failure by evaluating the balance of each \textit{Account} object after all of the concurrent actions have taken place. The nature of the tests ensures that the outcome should always be the same for correct functionality but a mutant will likely produce a different outcome. 
+All of these tests determine a pass or failure by evaluating the balance of each \textit{Account} object after all of the concurrent actions have taken place. The nature of the tests ensures that the outcome should always be the same for correct functionality but a mutant will likely produce a different outcome. The range of tests here covers all of the Banking system classes and all concurrent operations within them.
 
 \subsubsection{Incrementer Concurrent Tests}
 
@@ -565,11 +564,12 @@ All of these tests determine a pass or failure by evaluating the balance of each
 \\The \textit{LockTest} performs two \textit{incrementLocked} methods in separate threads to produce the interference bug shown in Section \ref{section:atmoic} Table \ref{table:non-atomic}. Removing the locks through a mutation will mean that the threads are attempting to access and modify the \textit{Incrementer} object's count at the same time. 
 
 \textbf{\\InterruptTest}
-
+\\This tests the \textit{incrementInterrupt} method by calling this in one thread and an \textit{incrementLocked} in another. If the \textit{interrupt} call has been removed by a mutation, then only one set of increments will be applied to the count and the final value will not be correct. 
 
 \textbf{\\AwaitSignalTest}
+\\The \textit{AwaitSignalTest} tests for the presence of the \textit{await} and \textit{signalAll} calls in the \textit{incrementAwait} and \textit{incrementSignal} methods. The functionality of the \textit{incrementAwait} in this test, depends on the \textit{incrementSignal} to be called and release it from its interrupted waiting state. The test will always pass with unaltered code, however it will not always fail when a mutation is introduced. This is because the outcome of this scenario depends on the order in which the two threads run. Thus, this test must be run multiple times until the mutation has been veritably caught. 
 
-Similar to the Banking system concurrent tests, the critical variable that is evaluated after concurrent actions have terminated is the count in this case.   
+Similar to the Banking system concurrent tests, the critical variable that is evaluated after concurrent actions have terminated is the count, in this case.   
 
 
 
